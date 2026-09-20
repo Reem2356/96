@@ -4,7 +4,7 @@ import { Hero } from "../components/Hero";
 const steps = [
   { icon: "🎙️", title: "شارك", desc: "بصوتك أو بكلماتك في أقل من دقيقة" },
   { icon: "✨", title: "تُحلَّل مشاركتك", desc: "نستخرج كلماتها المفتاحية تلقائيًا" },
-  { icon: "🧩", title: "تنضم إلى اللوحة", desc: "بعد اعتمادها تصبح قطعة في صورة قائدنا" },
+  { icon: "🧩", title: "تنضم إلى اللوحة", desc: "فورًا تصبح قطعة في صورة قائدنا" },
 ];
 
 export function HomePage() {

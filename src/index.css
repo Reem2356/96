@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  /* الهوية البصرية: أخضر سعودي، أخضر داكن، عاجي، أبيض، وذهبي كلون Accent محدود */
+  --color-saudi-green: #006c35;
+  --color-saudi-green-dark: #004d27;
+  --color-ivory: #f6f1e7;
+  --color-gold: #c9a24b;
+  --color-gold-light: #e4cd8f;
+  --color-ink: #12241c;
+
+  --font-arabic: "Tajawal", "Segoe UI", sans-serif;
+  --font-display: "Reem Kufi", "Tajawal", sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-arabic);
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-gold-light);
+  color: var(--color-saudi-green-dark);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-saudi-green) 40%, transparent);
+  border-radius: 999px;
+}
+
+.glass {
+  background: color-mix(in srgb, white 55%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in srgb, white 60%, transparent);
+}
+
+.glass-dark {
+  background: color-mix(in srgb, var(--color-saudi-green-dark) 55%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in srgb, white 12%, transparent);
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, var(--color-gold) 0%, var(--color-gold-light) 25%, var(--color-gold) 50%, var(--color-gold-light) 75%, var(--color-gold) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: var(--animate-shimmer);
+}
+
+/* شريط تمرير رفيع لعناصر أفقية داخل الواجهة */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}

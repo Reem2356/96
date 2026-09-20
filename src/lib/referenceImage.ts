@@ -53,14 +53,30 @@ async function computeTargetColorsFromImage(img: HTMLImageElement): Promise<Tile
   ctx.drawImage(img, sx, sy, size, size, 0, 0, GRID_SIZE, GRID_SIZE);
 
   const { data } = ctx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
+  const rawLuminance: number[] = [];
   const colors: TileTargetColor[] = [];
   for (let i = 0; i < TOTAL_TILES; i++) {
     const r = data[i * 4];
     const g = data[i * 4 + 1];
     const b = data[i * 4 + 2];
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    colors.push({ r, g, b, luminance });
+    rawLuminance.push((0.299 * r + 0.587 * g + 0.114 * b) / 255);
+    colors.push({ r, g, b, luminance: 0 });
   }
+
+  // تمديد التباين (Contrast Stretch): معظم الصور الفوتوغرافية لا تغطي كامل
+  // مدى الإضاءة من 0 إلى 1، فتتكدس كل القطع في منتصف تدرّج الألوان وتبدو
+  // اللوحة باهتة وغير واضحة عند اكتمالها. هنا نعيد توزيع الإضاءة الفعلية
+  // (من أغمق نقطة إلى أفتح نقطة في الصورة) لتغطي كامل المدى، فتصبح الفروق
+  // بين الوجه والخلفية والملابس أوضح بكثير في اللوحة النهائية.
+  const min = Math.min(...rawLuminance);
+  const max = Math.max(...rawLuminance);
+  const range = max - min || 1;
+  for (let i = 0; i < TOTAL_TILES; i++) {
+    const stretched = (rawLuminance[i] - min) / range;
+    // انحناء بسيط (Gamma) يبرز الفروق في المناطق المتوسطة أكثر من طرفي التدرّج
+    colors[i].luminance = Math.pow(Math.min(1, Math.max(0, stretched)), 0.85);
+  }
+
   return colors;
 }
 

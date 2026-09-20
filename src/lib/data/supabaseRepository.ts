@@ -30,10 +30,9 @@ function fromRow(row: SubmissionRow): Submission {
 const TABLE = "submissions";
 
 /**
- * تطبيق حقيقي متصل بـ Supabase. يعتمد على أن سياسات RLS المعرّفة في
- * supabase/schema.sql تمنع أي عميل مجهول من تحديد status عند الإدراج
- * (يُفرض pending دائمًا)، ومن تعديل status لاحقًا إلا عبر مستخدم Admin
- * مسجّل دخول (auth.uid() ضمن جدول admins). راجع الملف للتفاصيل الكاملة.
+ * تطبيق حقيقي متصل بـ Supabase. النشر فوري بدون مراجعة إشرافية مسبقة
+ * (بطلب صاحب الموقع) — راجع supabase/schema.sql لسياسات RLS المحدّثة،
+ * ولوحة الإدارة تبقى متاحة لحذف أو إخفاء أي مشاركة غير لائقة بعد نشرها.
  */
 export class SupabaseSubmissionsRepository implements SubmissionsRepository {
   private get client() {
@@ -45,14 +44,23 @@ export class SupabaseSubmissionsRepository implements SubmissionsRepository {
     const text = sanitizeText(input.text);
     if (!text) throw new Error("النص فارغ.");
 
-    // ملاحظة أمان: لا نرسل status إطلاقًا — القيمة الافتراضية في القاعدة
-    // هي 'pending' وسياسة RLS ترفض أي إدراج يحاول تحديد status صراحة.
+    const { count } = await this.client
+      .from(TABLE)
+      .select("id", { count: "exact", head: true })
+      .eq("status", "approved");
+
+    // ملاحظة: حساب tile_index هنا بسيط وليس ذريًا (Atomic) — عند حدوث
+    // مشاركتين متزامنتين تمامًا من مستخدمين مختلفين قد تتشارك القطعة نفسها
+    // نادرًا. مقبول لحجم الاستخدام المتوقع؛ يمكن لاحقًا نقل الحساب إلى
+    // Postgres function/trigger ذري إذا صار التزامن مرتفعًا.
     const { data, error } = await this.client
       .from(TABLE)
       .insert({
         text,
         input_type: input.inputType,
         keywords: extractKeywords(text),
+        status: "approved",
+        tile_index: tileIndexForApprovalOrder(count ?? 0),
       })
       .select()
       .single();

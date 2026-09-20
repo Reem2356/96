@@ -8,33 +8,26 @@ import { getTileVisual } from "../lib/tilePalette";
 import { indexToRowCol, TOTAL_TILES } from "../lib/mosaicGrid";
 
 interface TileAnimationProps {
-  text: string;
+  /** موضع القطعة الفعلي داخل الشبكة — المشاركة تُنشر فورًا فهذا موضعها الحقيقي لا معاينة وهمية */
+  tileIndex: number;
   keywords: string[];
   onFinish: () => void;
 }
 
-/** بذرة ثابتة من نص المشاركة لاختيار موضع "معاينة شخصية" فقط لهذه الحركة */
-function previewIndexFromText(text: string): number {
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
-  return hash % TOTAL_TILES;
-}
-
 type Phase = "center" | "moving" | "revealed";
 
-export function TileAnimation({ text, keywords, onFinish }: TileAnimationProps) {
+export function TileAnimation({ tileIndex, keywords, onFinish }: TileAnimationProps) {
   const [phase, setPhase] = useState<Phase>("center");
   const { submissions } = useApprovedSubmissions();
   const colors = useReferenceTileColors();
 
-  const previewIndex = useMemo(() => previewIndexFromText(text), [text]);
-  const { row, col } = indexToRowCol(previewIndex);
+  const { row, col } = indexToRowCol(tileIndex);
   const targetLeft = ((col + 0.5) / Math.sqrt(TOTAL_TILES)) * 100;
   const targetTop = ((row + 0.5) / Math.sqrt(TOTAL_TILES)) * 100;
 
   const visual = useMemo(
-    () => (colors ? getTileVisual(colors[previewIndex], previewIndex) : { background: "#006C35", foreground: "#F6F1E7", motif: "geometric" as const }),
-    [colors, previewIndex],
+    () => (colors ? getTileVisual(colors[tileIndex], tileIndex) : { background: "#006C35", foreground: "#F6F1E7", motif: "geometric" as const }),
+    [colors, tileIndex],
   );
 
   useEffect(() => {
@@ -89,7 +82,7 @@ export function TileAnimation({ text, keywords, onFinish }: TileAnimationProps) 
               approvedSubmissions={submissions}
               colors={colors}
               interactive={false}
-              highlightIndex={previewIndex}
+              highlightIndex={tileIndex}
             />
           </div>
 
@@ -116,9 +109,6 @@ export function TileAnimation({ text, keywords, onFinish }: TileAnimationProps) 
           >
             شاهد اللوحة كاملة
           </button>
-          <p className="mt-3 max-w-sm text-xs text-ink/50">
-            ملاحظة: ستظهر مشاركتك في اللوحة العامة بعد مراجعتها واعتمادها من فريق الإشراف.
-          </p>
         </motion.div>
       )}
     </div>

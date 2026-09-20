@@ -67,17 +67,20 @@ export class MockSubmissionsRepository implements SubmissionsRepository {
     const text = sanitizeText(input.text);
     if (!text) throw new Error("النص فارغ.");
 
+    // نشر فوري بدون مراجعة إشرافية مسبقة (بطلب صاحب الموقع). تبقى لوحة
+    // الإدارة متاحة لحذف أي مشاركة غير لائقة بعد نشرها.
+    const all = loadAll();
+    const approvedCountBefore = all.filter((s) => s.status === "approved").length;
     const submission: Submission = {
       id: uuid(),
       text,
       inputType: input.inputType,
       keywords: extractKeywords(text),
-      tileIndex: null,
-      status: "pending",
+      tileIndex: tileIndexForApprovalOrder(approvedCountBefore),
+      status: "approved",
       createdAt: new Date().toISOString(),
     };
 
-    const all = loadAll();
     all.push(submission);
     saveAll(all);
     localStorage.setItem(RATE_LIMIT_KEY, String(Date.now()));

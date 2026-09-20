@@ -7,25 +7,25 @@ import { ProcessingScreen } from "../components/ProcessingScreen";
 import { TileAnimation } from "../components/TileAnimation";
 import { extractKeywords } from "../lib/keywordExtraction";
 import { submissionsRepository } from "../lib/data";
-import type { InputType } from "../lib/types";
+import type { InputType, Submission } from "../lib/types";
 
 type Step = "select" | "voice" | "text" | "processing" | "result";
 
 export function ParticipatePage() {
   const [step, setStep] = useState<Step>("select");
-  const [finalText, setFinalText] = useState("");
+  const [submission, setSubmission] = useState<Submission | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const keywords = finalText ? extractKeywords(finalText) : [];
+  const keywords = submission ? extractKeywords(submission.text) : [];
 
   async function handleFinalText(text: string, type: InputType) {
     setError(null);
     setSubmitting(true);
     try {
-      await submissionsRepository.createSubmission({ text, inputType: type });
-      setFinalText(text);
+      const created = await submissionsRepository.createSubmission({ text, inputType: type });
+      setSubmission(created);
       setStep("processing");
     } catch (e) {
       setError(e instanceof Error ? e.message : "حدث خطأ غير متوقع، حاول مجددًا.");
@@ -70,8 +70,8 @@ export function ParticipatePage() {
 
       {step === "processing" && <ProcessingScreen keywords={keywords} onDone={() => setStep("result")} />}
 
-      {step === "result" && (
-        <TileAnimation text={finalText} keywords={keywords} onFinish={() => navigate("/mosaic")} />
+      {step === "result" && submission?.tileIndex != null && (
+        <TileAnimation tileIndex={submission.tileIndex} keywords={keywords} onFinish={() => navigate("/mosaic")} />
       )}
     </div>
   );

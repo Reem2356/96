@@ -78,13 +78,15 @@ create policy "admins can read all"
   to authenticated
   using (public.is_admin());
 
--- الإدراج: أي زائر يمكنه إرسال مشاركة جديدة، بشرط أن تبقى حالتها pending.
--- لا يمكن للعميل إطلاقًا إرسال status = 'approved' مباشرة عبر هذه السياسة.
+-- الإدراج: أي زائر يمكنه إرسال مشاركة جديدة وتُنشر فورًا بدون مراجعة
+-- إشرافية مسبقة (بطلب صاحب الموقع). لوحة الإدارة تبقى متاحة لحذف أو
+-- إخفاء (status = 'rejected') أي مشاركة غير لائقة بعد نشرها.
 drop policy if exists "anyone can insert pending" on public.submissions;
-create policy "anyone can insert pending"
+drop policy if exists "anyone can insert approved" on public.submissions;
+create policy "anyone can insert approved"
   on public.submissions for insert
   to anon, authenticated
-  with check (status = 'pending' and tile_index is null);
+  with check (status = 'approved');
 
 -- التحديث (اعتماد/رفض وتعيين رقم القطعة): للمشرفين فقط.
 drop policy if exists "admins can update" on public.submissions;

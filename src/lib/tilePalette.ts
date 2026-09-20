@@ -51,8 +51,8 @@ const MOTIFS: TileMotif[] = ["geometric", "palm", "calligraphy", "star", "plain"
 
 /**
  * يحوّل لون الخلية الهدف (من الصورة المرجعية) إلى لون فعلي ضمن هويتنا
- * البصرية المحدودة (أخضر/عاجي/أبيض + ذهبي نادر جدًا)، حتى تبقى صورة
- * الملك سلمان واضحة عند النظر إلى اللوحة من بعيد رغم التزامنا بالألوان.
+ * البصرية المحدودة (أخضر/عاجي/أبيض فقط)، حتى تبقى صورة الملك سلمان
+ * واضحة عند النظر إلى اللوحة من بعيد رغم التزامنا بالألوان.
  */
 export function getTileVisual(target: TileTargetColor, tileIndex: number): TileVisual {
   const [r, g, b] = colorForLuminance(target.luminance);
@@ -60,12 +60,9 @@ export function getTileVisual(target: TileTargetColor, tileIndex: number): TileV
   const isDark = target.luminance < 0.5;
   const foreground = isDark ? "#F6F1E7" : "#004D27";
 
-  // لمسة ذهبية نادرة جدًا (Accent محدود) في مناطق منتصف الإضاءة فقط
-  const useGold = target.luminance > 0.4 && target.luminance < 0.58 && seededPick(tileIndex, [0, 0, 0, 0, 0, 1]) === 1;
-
   return {
-    background: useGold ? "#C9A24B" : background,
-    foreground: useGold ? "#004D27" : foreground,
+    background,
+    foreground,
     motif: seededPick(tileIndex, MOTIFS),
   };
 }

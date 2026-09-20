@@ -13,14 +13,19 @@ export interface TileTargetColor {
  * ⭐ ضع هنا الصورة المرجعية الرسمية والمصرَّح باستخدامها لخادم الحرمين
  *    الشريفين الملك سلمان بن عبدالعزيز آل سعود.
  *
- *    1) ضع ملف الصورة في: public/reference/king-salman.jpg
+ *    1) ضع ملف الصورة في: public/reference/king-salman.png
  *       (jpg أو png، يُفضّل مقاس مربّع أو قريب منه، دقة 1000×1000 فأعلى)
  *    2) لا حاجة لتغيير أي كود آخر — سيتم تحميلها تلقائيًا من المسار أدناه.
  *    3) إن لم يوجد الملف بعد، سيستخدم الموقع نمطًا بديلاً تجريبيًا فقط
  *       (انظر buildPlaceholderTargetColors) حتى لا يتعطل التطوير أو العرض.
+ *
+ *    ملاحظة تقنية: نبني المسار عبر import.meta.env.BASE_URL بدل مسار
+ *    مطلق ثابت "/reference/..."، لأن الموقع منشور تحت مسار فرعي
+ *    (/96/) على GitHub Pages — مسار ثابت كان سيتجاهل هذا المسار الفرعي
+ *    ويحاول التحميل من جذر النطاق فيفشل بصمت.
  * ==========================================================================
  */
-export const REFERENCE_IMAGE_PATH = "/reference/king-salman.jpg";
+export const REFERENCE_IMAGE_PATH = `${import.meta.env.BASE_URL}reference/king-salman.png`;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {

@@ -29,7 +29,7 @@ npm run dev
 ## الصورة المرجعية
 
 اللوحة تحتاج صورة رسمية مصرَّح باستخدامها لخادم الحرمين الشريفين لتُستخدم
-كمرجع لتلوين القطع. ضعها في `public/reference/king-salman.png` — التفاصيل
+كمرجع لتلوين القطع. ضعها في `public/reference/king-salman.webp` — التفاصيل
 في [`public/reference/README.md`](./public/reference/README.md) وفي تعليقات
 `src/lib/referenceImage.ts`. بدونها يعمل الموقع بنمط بديل تجريبي.
 

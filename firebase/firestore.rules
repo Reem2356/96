@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// ============================================================================
+// صوتك يرسم الوطن — قواعد أمان Firestore
+// انسخ هذا الملف كاملاً إلى Firebase Console → Firestore Database → Rules
+// (أو انشره عبر Firebase CLI: firebase deploy --only firestore:rules)
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // مجموعة admins: وثيقة واحدة لكل مشرف، معرّفها هو Firebase Auth UID
+    // الخاص به. لا صلاحية قراءة/كتابة مباشرة من العميل على هذه المجموعة
+    // إطلاقًا — تُضاف الوثائق يدويًا من Firebase Console فقط.
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /submissions/{id} {
+      // القراءة العامة: أي زائر يمكنه رؤية المشاركات المعتمدة فقط.
+      // المشرفون فقط يمكنهم رؤية كل المشاركات (لوحة الإدارة).
+      allow read: if resource.data.status == 'approved' || isAdmin();
+
+      // الإدراج: أي زائر يمكنه إرسال مشاركة جديدة، وتُنشر فورًا بحالة
+      // approved بدون مراجعة إشرافية مسبقة (بطلب صاحب الموقع). نتحقق من
+      // شكل البيانات لمنع حقول أو قيم غير متوقعة.
+      allow create: if request.resource.data.status == 'approved'
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 150
+        && request.resource.data.inputType in ['voice', 'text']
+        && request.resource.data.keywords is list
+        && request.resource.data.tileIndex is int;
+
+      // التحديث والحذف (رفض/حذف مشاركة غير لائقة بعد نشرها): للمشرفين فقط.
+      allow update, delete: if isAdmin();
+    }
+  }
+}

@@ -25,13 +25,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # لا نمرر VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY هنا عمدًا: Vite
+      # يقرأهما مباشرة من .env.production المحفوظ في المستودع. تمريرهما
+      # كمتغيرات بيئة فارغة هنا (لو ما أُضيفا كأسرار GitHub) كان يطغى على
+      # قيم .env.production الصحيحة ويجبر البناء على العودة لوضع Mock —
+      # هذا بالضبط سبب ظهور بيانات تجريبية بدل الاتصال الحقيقي بـ Supabase.
       - run: npm run build
-        env:
-          # في حال ربط Supabase حقيقي، أضف هذين السرّين من Settings → Secrets
-          # (Repository secrets) باسمي VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY.
-          # بدونهما يُبنى الموقع تلقائيًا بوضع البيانات التجريبية.
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

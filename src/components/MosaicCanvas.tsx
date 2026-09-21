@@ -13,7 +13,7 @@ interface MosaicCanvasProps {
   className?: string;
 }
 
-const BASE_RESOLUTION = 960; // دقة داخلية ثابتة لرسم Canvas بوضوح عالٍ بغض النظر عن حجم الشاشة
+const BASE_RESOLUTION = 1600; // دقة داخلية ثابتة لرسم Canvas بوضوح عالٍ بغض النظر عن حجم الشاشة
 
 /**
  * يرسم اللوحة الكاملة على Canvas بدل عناصر DOM منفصلة لكل قطعة، ما يسمح

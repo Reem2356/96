@@ -6,7 +6,7 @@
  * نستخدم افتراضيًا شبكة أصغر قابلة للتهيئة. يمكن رفعها إلى 100 بأمان إذا
  * تم الرسم عبر Canvas بدل DOM (انظر MosaicCanvas.tsx).
  */
-export const GRID_SIZE = 48; // 48×48 = 2,304 قطعة — عدّلها هنا لتغيير كثافة اللوحة
+export const GRID_SIZE = 80; // 80×80 = 6,400 قطعة — عدّلها هنا لتغيير كثافة اللوحة
 export const TOTAL_TILES = GRID_SIZE * GRID_SIZE;
 
 export function indexToRowCol(index: number): { row: number; col: number } {

@@ -156,8 +156,13 @@ export class SupabaseSubmissionsRepository implements SubmissionsRepository {
   }
 
   subscribeToApproved(callback: (submissions: Submission[]) => void): Unsubscribe {
+    // اسم قناة فريد لكل استدعاء: عدة مكونات (Hero + useMosaicStats مثلاً)
+    // قد تشترك في هذا المصدر بنفس الوقت على نفس الصفحة، وSupabase يعيد
+    // استخدام نفس كائن القناة لأي اسم مكرر — فيفشل عند استدعاء .on() على
+    // قناة سبق أن نودي عليها .subscribe() من مكان آخر.
+    const channelName = `submissions-approved-${Math.random().toString(36).slice(2)}`;
     const channel = this.client
-      .channel("submissions-approved")
+      .channel(channelName)
       .on("postgres_changes", { event: "*", schema: "public", table: TABLE }, () => {
         this.listApproved().then(callback);
       })
